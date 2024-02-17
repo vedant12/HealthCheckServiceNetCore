@@ -11,6 +11,17 @@ namespace HealthCheckService.Implementation
             await Execute();
         }
 
+        public async static void WriteFile(string response)
+        {
+            string path = @$"E:\logs\service-log-{DateTime.Now.ToString("yyyy-MM-dd")}.txt";
+
+            await using (StreamWriter writer = new StreamWriter(path, true))
+            {
+                writer.WriteLine(response);
+                writer.Close();
+            }
+        }
+
         public async Task Execute()
         {
             try
@@ -27,13 +38,7 @@ namespace HealthCheckService.Implementation
                         var res = await response.Content.ReadAsStringAsync();
                         //var jsonResponse = JsonConvert.DeserializeObject<JsonResponse>(res);
 
-                        string path = @$"E:\logs\service-log-{DateTime.Now.ToString("yyyy-MM-dd")}.txt";
-                        
-                        await using (StreamWriter writer = new StreamWriter(path, true))
-                        {
-                            writer.WriteLine(res);
-                            writer.Close();
-                        }
+                        WriteFile(res);
                     }
                     else
                     {
@@ -43,7 +48,7 @@ namespace HealthCheckService.Implementation
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + ex.Message);
+                WriteFile(ex.Message);
             }
         }
     }
